@@ -1,26 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, Heart, ShoppingBag, Truck, Shield, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
-import { products } from '../data/products';
+import { fetchProduct } from '../lib/api';
 import { useCart } from '../context/CartContext';
 import './Product.css';
 
 export default function Product() {
   const { id } = useParams();
-  const product = products.find((p) => p.id === parseInt(id));
   const { addToCart } = useCart();
 
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedVariants, setSelectedVariants] = useState({
-    color: product?.variants?.colors?.[0] || '',
-    size: product?.variants?.sizes?.[0] || '',
-    type: product?.variants?.types?.[0] || '',
-  });
+  const [selectedVariants, setSelectedVariants] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
   const [addedToCart, setAddedToCart] = useState(false);
 
-  if (!product) {
+  useEffect(() => {
+    async function loadProduct() {
+      try {
+        setLoading(true);
+        const data = await fetchProduct(id);
+        setProduct(data);
+        const variants = {};
+        if (data.variants?.colors?.length > 0) variants.color = data.variants.colors[0];
+        if (data.variants?.sizes?.length > 0) variants.size = data.variants.sizes[0];
+        if (data.variants?.types?.length > 0) variants.type = data.variants.types[0];
+        setSelectedVariants(variants);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (id) loadProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="product-page">
+        <div className="product-page__container">
+          <div className="product-page__gallery">
+            <div className="product-page__main-image skeleton" />
+            <div className="product-page__thumbnails skeleton" />
+          </div>
+          <div className="product-page__info skeleton" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
     return (
       <div className="product-not-found">
         <h1>Product Not Found</h1>
@@ -51,11 +84,13 @@ export default function Product() {
   };
 
   const nextImage = () => {
-    setSelectedImage((prev) => (prev + 1) % product.images.length);
+    const images = product.images || [product.image];
+    setSelectedImage((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = () => {
-    setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+    const images = product.images || [product.image];
+    setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
   };
 
   const renderStars = (rating) => {
@@ -70,14 +105,16 @@ export default function Product() {
     ));
   };
 
+  const images = product.images || [product.image];
+
   return (
     <div className="product-page">
       <div className="product-page__container">
         {/* Image Gallery */}
         <div className="product-page__gallery">
           <div className="product-page__main-image">
-            <img src={product.images[selectedImage]} alt={product.name} />
-            {product.images.length > 1 && (
+            <img src={images[selectedImage]} alt={product.name} />
+            {images.length > 1 && (
               <>
                 <button className="product-page__nav product-page__nav--prev" onClick={prevImage}>
                   <ChevronLeft size={20} />
@@ -89,7 +126,7 @@ export default function Product() {
             )}
           </div>
           <div className="product-page__thumbnails">
-            {product.images.map((img, index) => (
+            {images.map((img, index) => (
               <button
                 key={index}
                 className={`product-page__thumb ${index === selectedImage ? 'active' : ''}`}
@@ -103,19 +140,19 @@ export default function Product() {
 
         {/* Product Info */}
         <div className="product-page__info">
-          <span className="product-page__brand">Swarajya Imperial</span>
+          <span className="product-page__brand">{product.brand || 'Swarajya Imperial'}</span>
           <h1 className="product-page__title">{product.name}</h1>
 
           <div className="product-page__rating">
-            {renderStars(product.rating)}
-            <span className="product-page__rating-count">{product.rating} | {product.reviewCount} reviews</span>
+            {renderStars(product.rating || 4.5)}
+            <span className="product-page__rating-count">{product.rating || 4.5} | {product.reviewCount || 0} reviews</span>
           </div>
 
           <div className="product-page__pricing">
-            <span className="product-page__price">₹{product.price.toLocaleString('en-IN')}</span>
+            <span className="product-page__price">₹{product.price?.toLocaleString('en-IN')}</span>
             {product.originalPrice && (
               <>
-                <span className="product-page__original-price">₹{product.originalPrice.toLocaleString('en-IN')}</span>
+                <span className="product-page__original-price">₹{product.originalPrice?.toLocaleString('en-IN')}</span>
                 <span className="product-page__discount">{discount}% OFF</span>
               </>
             )}
@@ -235,7 +272,7 @@ export default function Product() {
           className={`product-page__tab ${activeTab === 'reviews' ? 'active' : ''}`}
           onClick={() => setActiveTab('reviews')}
         >
-          Reviews ({product.reviewCount})
+          Reviews ({product.reviewCount || 0})
         </button>
         <button
           className={`product-page__tab ${activeTab === 'shipping' ? 'active' : ''}`}
@@ -254,7 +291,7 @@ export default function Product() {
 
         {activeTab === 'reviews' && (
           <div className="product-page__reviews">
-            {product.reviews.length === 0 ? (
+            {!product.reviews || product.reviews.length === 0 ? (
               <p className="product-page__no-reviews">No reviews yet. Be the first to review this product!</p>
             ) : (
               product.reviews.map((review) => (

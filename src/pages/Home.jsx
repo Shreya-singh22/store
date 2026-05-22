@@ -1,39 +1,68 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { heroSlides, collections } from '../data/products';
+import { useStore } from '../context/StoreContext';
 import './Home.css';
 
-const brandCategories = [
-  { name: 'JEWELLERY SETS', path: '/JEWELLERY-SETS/collection/9KBdf2xY', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80' },
-  { name: 'NECKLACE', path: '/NECKLACE/collection/e2jUNDe1', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80' },
-  { name: 'EARRINGS', path: '/EARRINGS/collection/uzxgRjeA', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80' },
-];
-
 export default function Home() {
+  const { storeData } = useStore();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [heroImages] = useState(heroSlides);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  const heroSlides = storeData?.store?.heroSlides?.length > 0
+    ? storeData.store.heroSlides
+    : [
+        {
+          id: 1,
+          image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=80',
+          title: 'Elegant Jewellery',
+          subtitle: 'Discover timeless pieces',
+          cta: 'Shop Now',
+        },
+        {
+          id: 2,
+          image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1400&q=80',
+          title: 'Premium Collection',
+          subtitle: 'Crafted with excellence',
+          cta: 'Explore',
+        },
+      ];
+
+  const collections = storeData?.collections?.length > 0
+    ? storeData.collections
+    : [];
+
+  const brandCategories = storeData?.categories?.length > 0
+    ? storeData.categories.slice(0, 3).map(cat => ({
+        name: cat.name?.toUpperCase() || cat.title?.toUpperCase() || '',
+        path: `/catalogue?category=${cat.id || cat.slug}`,
+        image: cat.image || cat.imageUrl || '',
+      }))
+    : [
+        { name: 'JEWELLERY SETS', path: '/catalogue?category=jewellery-sets', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80' },
+        { name: 'NECKLACE', path: '/catalogue?category=necklace', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80' },
+        { name: 'EARRINGS', path: '/catalogue?category=earrings', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80' },
+      ];
+
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
 
   useEffect(() => {
     const interval = setInterval(nextSlide, 5000);
     return () => clearInterval(interval);
-  }, [heroImages.length]);
+  }, [heroSlides.length]);
 
   return (
     <div className="home">
       {/* Hero Carousel */}
       <section className="hero-carousel">
         <div className="hero-carousel__track" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-          {heroImages.map((slide, index) => (
+          {heroSlides.map((slide, index) => (
             <div key={slide.id || index} className="hero-carousel__slide">
               <img src={slide.image} alt={slide.title} className="hero-carousel__image" />
               <div className="hero-carousel__content">
                 <h1>{slide.title}</h1>
                 <p>{slide.subtitle}</p>
-                <Link to="/JEWELLERY-SETS/collection/9KBdf2xY" className="hero-carousel__cta">
+                <Link to="/catalogue?category=jewellery-sets" className="hero-carousel__cta">
                   {slide.cta}
                 </Link>
               </div>
@@ -47,7 +76,7 @@ export default function Home() {
           <ChevronRight size={24} />
         </button>
         <div className="hero-carousel__dots">
-          {heroImages.map((_, index) => (
+          {heroSlides.map((_, index) => (
             <button
               key={index}
               className={`hero-carousel__dot ${index === currentSlide ? 'active' : ''}`}
@@ -77,7 +106,7 @@ export default function Home() {
         <h2 className="section-title">SHOP BY CATEGORY</h2>
         <div className="shop-category__grid">
           {brandCategories.map((cat) => (
-            <Link key={cat.name} to={cat.path} className="shop-category__card">
+            <Link key={`shop-${cat.name}`} to={cat.path} className="shop-category__card">
               <img src={cat.image} alt={cat.name} className="shop-category__image" />
               <div className="shop-category__overlay">
                 <span className="shop-category__name">{cat.name}</span>
@@ -112,8 +141,8 @@ export default function Home() {
         <div className="featured-collection__grid">
           {collections.slice(0, 4).map((col) => (
             <Link key={col.id} to={`/catalogue?category=${col.id}`} className="featured-collection__item">
-              <img src={col.image} alt={col.name} />
-              <span>{col.name}</span>
+              <img src={col.image || col.imageUrl} alt={col.name || col.title} />
+              <span>{col.name || col.title}</span>
             </Link>
           ))}
         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useStore } from '../context/StoreContext';
 import './AnnouncementBar.css';
 
 function pad(n) {
@@ -6,7 +7,9 @@ function pad(n) {
 }
 
 export default function AnnouncementBar() {
+  const { storeData } = useStore();
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 3, seconds: 0 });
+  const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -22,7 +25,6 @@ export default function AnnouncementBar() {
           minutes = 59;
           seconds = 59;
         } else {
-          // Reset when reaches 00:00:00
           hours = 0;
           minutes = 3;
           seconds = 0;
@@ -33,13 +35,30 @@ export default function AnnouncementBar() {
     return () => clearInterval(interval);
   }, []);
 
-  const messages = [
+  useEffect(() => {
+    if (storeData?.announcements?.length > 0) {
+      const cycleInterval = setInterval(() => {
+        setCurrentAnnouncementIndex((prev) => (prev + 1) % storeData.announcements.length);
+      }, 5000);
+      return () => clearInterval(cycleInterval);
+    }
+  }, [storeData?.announcements?.length]);
+
+  const apiMessages = storeData?.announcements?.length > 0
+    ? storeData.announcements.map(a => a.message || a.text || '')
+    : [];
+
+  const staticMessages = [
     'Extra discounts of Rs.650 at checkout',
     'Hurry Up, Shop Now!',
     '50% Off',
     `Limited Time: ${pad(timeLeft.hours)}H:${pad(timeLeft.minutes)}M:${pad(timeLeft.seconds)}S`,
     'Save Min 50% on all orders and get free shipping',
   ];
+
+  const messages = apiMessages.length > 0 ? apiMessages : staticMessages;
+
+  const currentMessage = messages[currentAnnouncementIndex] || messages[0];
 
   return (
     <div className="announcement-bar">

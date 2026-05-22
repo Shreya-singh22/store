@@ -2,15 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, User, Menu, X, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useStore } from '../context/StoreContext';
 import './Header.css';
-
-const navLinks = [
-  { label: 'HOME', path: '/' },
-  { label: 'JEWELLERY SETS', path: '/catalogue?category=jewellery-sets' },
-  { label: 'NECKLACE', path: '/catalogue?category=necklace' },
-  { label: 'EARINGS', path: '/catalogue?category=earrings' },
-  { label: 'BEST SELLER', path: '/catalogue?category=best-seller' },
-];
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -19,6 +12,19 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
   const { cartCount, setIsCartOpen } = useCart();
+  const { storeData } = useStore();
+
+  const navLinks = storeData?.store?.navLinks?.length > 0
+    ? storeData.store.navLinks
+    : [
+        { label: 'HOME', path: '/' },
+        { label: 'JEWELLERY SETS', path: '/catalogue?category=jewellery-sets' },
+        { label: 'NECKLACE', path: '/catalogue?category=necklace' },
+        { label: 'EARINGS', path: '/catalogue?category=earrings' },
+        { label: 'BEST SELLER', path: '/catalogue?category=best-seller' },
+      ];
+
+  const logoUrl = storeData?.store?.logo || storeData?.customization?.logo || 'https://d1311wbk6unapo.cloudfront.net/NushopWebsiteAsset/tr:w-300,,f-webp,fo-auto/686907a872a04e21d2c32db3_brand_logo_HC7VFLYTI4_2026-03-02.jpg';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -75,7 +81,7 @@ export default function Header() {
 
           <Link to="/" className="header__logo">
             <img
-              src="https://d1311wbk6unapo.cloudfront.net/NushopWebsiteAsset/tr:w-300,,f-webp,fo-auto/686907a872a04e21d2c32db3_brand_logo_HC7VFLYTI4_2026-03-02.jpg"
+              src={logoUrl}
               alt="Swarajya Imperial"
               className="header__logo-img"
             />
@@ -104,7 +110,7 @@ export default function Header() {
           <div className="header__nav-inner">
             {navLinks.map((link) => (
               <Link
-                key={link.path}
+                key={link.path || link.label}
                 to={link.path}
                 className={`header__nav-link ${location.pathname === link.path ? 'header__nav-link--active' : ''}`}
               >
@@ -126,7 +132,7 @@ export default function Header() {
               </button>
             </div>
             {navLinks.map((link) => (
-              <Link key={link.path} to={link.path} className="header__mobile-link">
+              <Link key={`mobile-${link.path || link.label}`} to={link.path} className="header__mobile-link">
                 {link.label}
               </Link>
             ))}

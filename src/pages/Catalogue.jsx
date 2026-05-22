@@ -1,26 +1,53 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
+import { useStore } from '../context/StoreContext';
 import './Catalogue.css';
-
-const categories = [
-  { id: 'all', label: 'All' },
-  { id: 'jewellery-sets', label: 'Jewellery Sets' },
-  { id: 'necklace', label: 'Necklace' },
-  { id: 'earrings', label: 'Earrings' },
-  { id: 'best-seller', label: 'Best Seller' },
-];
 
 export default function Catalogue() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get('category') || 'all';
   const [selectedCategory, setSelectedCategory] = useState(categoryParam);
   const [sortBy, setSortBy] = useState('featured');
+  const { storeData } = useStore();
+
+  const apiCategories = storeData?.categories || [];
+  const apiProducts = storeData?.products || [];
+
+  const categories = apiCategories.length > 0
+    ? [{ id: 'all', label: 'All' }, ...apiCategories.map(c => ({ id: c.id || c.slug, label: c.name || c.title }))]
+    : [
+        { id: 'all', label: 'All' },
+        { id: 'jewellery-sets', label: 'Jewellery Sets' },
+        { id: 'necklace', label: 'Necklace' },
+        { id: 'earrings', label: 'Earrings' },
+        { id: 'best-seller', label: 'Best Seller' },
+      ];
+
+  const products = apiProducts.length > 0
+    ? apiProducts.map(p => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        image: p.images?.[0] || p.image,
+        images: p.images || [p.image],
+        category: p.category?.id || p.category,
+        rating: p.rating || 4.5,
+        reviewCount: p.reviewCount || 0,
+        description: p.description || '',
+        variants: p.variants,
+      }))
+    : [];
 
   const filteredProducts = selectedCategory === 'all'
     ? products
-    : products.filter((p) => p.category === selectedCategory);
+    : products.filter((p) => {
+        if (typeof p.category === 'string') {
+          return p.category.toLowerCase() === selectedCategory.toLowerCase();
+        }
+        return p.category?.id === selectedCategory;
+      });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
