@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag, User, Menu, X, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useCustomization } from '../context/StoreContext';
@@ -11,7 +11,8 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
-  const { cartCount, setIsCartOpen } = useCart();
+  const navigate = useNavigate();
+  const { cartCount } = useCart();
   const c = useCustomization();
 
   // API: customization.navLinks — each has .label and .href (not .path)
@@ -105,7 +106,7 @@ export default function Header() {
             </Link>
             <button
               className="header__icon-btn header__cart-btn"
-              onClick={() => setIsCartOpen(true)}
+              onClick={() => navigate('/cart')}
               aria-label="Cart"
             >
               <ShoppingBag size={20} strokeWidth={1.5} />
