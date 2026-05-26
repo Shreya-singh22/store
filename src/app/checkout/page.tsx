@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import { Loader2, Phone, CheckCircle2, Truck, ChevronRight } from 'lucide-react';
@@ -68,7 +68,7 @@ export default function CheckoutPage() {
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [payUData, setPayUData] = useState<any>(null);
 
-  const subtotal = useMemo(() => cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0), [cartItems]);
+  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   // Initialize device ID and validate session on mount
   useEffect(() => {

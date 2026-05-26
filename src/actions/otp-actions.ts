@@ -60,6 +60,7 @@ export async function sendOtp(data: unknown) {
 
   try {
     const url = `https://2factor.in/API/V1/${process.env.TWO_FACTOR_API_KEY}/SMS/${encodeURIComponent(formattedPhone)}/AUTOGEN3/OTP1`;
+    console.log('[OTP] Send URL:', url.replace(process.env.TWO_FACTOR_API_KEY!, '***'));
 
     const response = await fetch(url, {
       method: "GET",
@@ -67,7 +68,9 @@ export async function sendOtp(data: unknown) {
       cache: "no-store",
     });
 
+    console.log('[OTP] Send response status:', response.status);
     const result = await response.json();
+    console.log('[OTP] Send response:', result);
 
     if (result.Status !== "Success") {
       return {
@@ -115,11 +118,12 @@ export async function verifyOtp(data: unknown) {
     return { success: false, message: "OTP has expired. Please request a new one." };
   }
 
-  const actualSessionId = sessionId || pending.sessionId;
+  const phoneForVerify = `91${cleanPhone}`;
 
   try {
-    const phoneForVerify = `91${cleanPhone}`;
     const url = `https://2factor.in/API/V1/${process.env.TWO_FACTOR_API_KEY}/SMS/VERIFY3/${phoneForVerify}/${code}`;
+    console.log('[OTP] Verify URL:', url.replace(process.env.TWO_FACTOR_API_KEY!, '***'));
+    console.log('[OTP] Phone for verify:', phoneForVerify);
 
     const response = await fetch(url, {
       method: "GET",
@@ -127,7 +131,9 @@ export async function verifyOtp(data: unknown) {
       cache: "no-store",
     });
 
+    console.log('[OTP] Verify response status:', response.status);
     const result = await response.json();
+    console.log('[OTP] Verify response:', result);
 
     if (result.Status !== "Success") {
       return { success: false, message: result.Details || "Invalid OTP" };
@@ -140,6 +146,7 @@ export async function verifyOtp(data: unknown) {
       message: "OTP verified successfully",
     };
   } catch (error: any) {
+    console.error('[OTP] Verify error:', error);
     return { success: false, message: error.message || "Failed to verify OTP" };
   }
 }

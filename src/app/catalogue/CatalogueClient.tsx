@@ -1,11 +1,9 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useState, useCallback } from 'react';
+import { Suspense, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
-import { CategorySkeleton, ProductGridSkeleton } from './Skeleton';
-import './skeleton.css';
+import { ProductGridSkeleton } from './Skeleton';
 
 interface Product {
   id: string;
@@ -23,7 +21,7 @@ interface CatalogueClientProps {
   categories: string[];
 }
 
-export default function CatalogueClient({ products, categories }: CatalogueClientProps) {
+function CatalogueClientInner({ products, categories }: CatalogueClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') || 'all';
@@ -64,28 +62,6 @@ export default function CatalogueClient({ products, categories }: CatalogueClien
 
   const categoryLabel = categoryList.find(c => c.id === selectedCategory)?.label || 'All Products';
 
-  if (products.length === 0 && categories.length === 0) {
-    return (
-      <div className="catalogue">
-        <div className="catalogue__header">
-          <h1>ALL PRODUCTS</h1>
-          <span className="catalogue__count">0 items</span>
-        </div>
-        <div className="catalogue__layout">
-          <aside className="catalogue__sidebar">
-            <div className="catalogue__filter-group">
-              <h3>Categories</h3>
-              <CategorySkeleton />
-            </div>
-          </aside>
-          <div className="catalogue__main">
-            <ProductGridSkeleton count={6} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="catalogue">
       <div className="catalogue__header">
@@ -97,21 +73,19 @@ export default function CatalogueClient({ products, categories }: CatalogueClien
         <aside className="catalogue__sidebar">
           <div className="catalogue__filter-group">
             <h3>Categories</h3>
-            <Suspense fallback={<CategorySkeleton />}>
-              <div className="catalogue__filter-options">
-                {categoryList.map((cat) => (
-                  <label key={cat.id} className="catalogue__filter-option">
-                    <input
-                      type="radio"
-                      name="category"
-                      checked={selectedCategory === cat.id}
-                      onChange={() => handleCategoryChange(cat.id)}
-                    />
-                    <span>{cat.label}</span>
-                  </label>
-                ))}
-              </div>
-            </Suspense>
+            <div className="catalogue__filter-options">
+              {categoryList.map((cat) => (
+                <label key={cat.id} className="catalogue__filter-option">
+                  <input
+                    type="radio"
+                    name="category"
+                    checked={selectedCategory === cat.id}
+                    onChange={() => handleCategoryChange(cat.id)}
+                  />
+                  <span>{cat.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </aside>
 
@@ -126,23 +100,29 @@ export default function CatalogueClient({ products, categories }: CatalogueClien
             </select>
           </div>
 
-          <Suspense fallback={<ProductGridSkeleton count={6} />}>
-            {isLoading ? (
-              <ProductGridSkeleton count={6} />
-            ) : sortedProducts.length === 0 ? (
-              <div className="catalogue__empty">
-                <p>No products found in this category.</p>
-              </div>
-            ) : (
-              <div className="catalogue__grid">
-                {sortedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            )}
-          </Suspense>
+          {isLoading ? (
+            <ProductGridSkeleton count={6} />
+          ) : sortedProducts.length === 0 ? (
+            <div className="catalogue__empty">
+              <p>No products found in this category.</p>
+            </div>
+          ) : (
+            <div className="catalogue__grid">
+              {sortedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CatalogueClient(props: CatalogueClientProps) {
+  return (
+    <Suspense fallback={<ProductGridSkeleton count={6} />}>
+      <CatalogueClientInner {...props} />
+    </Suspense>
   );
 }

@@ -14,10 +14,7 @@ const HomeIcon = () => (
 );
 
 export default function Header() {
-  console.log('[HEADER] Rendering Header');
-
   const { cartCount, isHydrated } = useCart();
-  console.log('[HEADER] Cart count:', cartCount, '| Hydrated:', isHydrated);
 
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -25,14 +22,12 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    console.log('[HEADER] Setting up scroll listener');
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
-    console.log('[HEADER] Mobile menu open:', mobileMenuOpen);
     document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [mobileMenuOpen]);
@@ -55,10 +50,7 @@ export default function Header() {
             <div className={`header__search ${searchOpen ? 'header__search--open' : ''}`}>
               <button
                 className="header__icon-btn"
-                onClick={() => {
-                  console.log('[HEADER] Search toggle:', !searchOpen);
-                  setSearchOpen(!searchOpen);
-                }}
+                onClick={() => setSearchOpen(!searchOpen)}
                 aria-label="Search"
               >
                 <Search size={20} strokeWidth={1.5} />
@@ -79,10 +71,7 @@ export default function Header() {
 
             <button
               className="header__mobile-toggle"
-              onClick={() => {
-                console.log('[HEADER] Mobile menu open');
-                setMobileMenuOpen(true);
-              }}
+              onClick={() => setMobileMenuOpen(true)}
               aria-label="Menu"
             >
               <Menu size={24} />
@@ -128,17 +117,11 @@ export default function Header() {
 
       {/* Mobile Overlay Menu */}
       {mobileMenuOpen && (
-        <div className="header__mobile-overlay" onClick={() => {
-          console.log('[HEADER] Closing mobile menu');
-          setMobileMenuOpen(false);
-        }}>
+        <div className="header__mobile-overlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="header__mobile-menu" onClick={(e) => e.stopPropagation()}>
             <div className="header__mobile-header">
               <span className="header__mobile-logo">SWARAJYA IMPERIAL</span>
-              <button onClick={() => {
-                console.log('[HEADER] Close button clicked');
-                setMobileMenuOpen(false);
-              }} aria-label="Close">
+              <button onClick={() => setMobileMenuOpen(false)} aria-label="Close">
                 <X size={24} />
               </button>
             </div>
@@ -166,10 +149,7 @@ export default function Header() {
           </Link>
           <button
             className="header__mobile-tab"
-            onClick={() => {
-              console.log('[HEADER] Browse tab clicked');
-              setMobileMenuOpen(true);
-            }}
+            onClick={() => setMobileMenuOpen(true)}
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
             <Menu size={22} strokeWidth={1.5} />
@@ -177,10 +157,7 @@ export default function Header() {
           </button>
           <button
             className="header__mobile-tab"
-            onClick={() => {
-              console.log('[HEADER] Search tab clicked');
-              setSearchOpen(true);
-            }}
+            onClick={() => setSearchOpen(true)}
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
             <Search size={22} strokeWidth={1.5} />

@@ -29,31 +29,20 @@ const brandCategories = [
 ];
 
 export default function HomeClient({ bestSellers }: HomeClientProps) {
-  console.log('[HOME_CLIENT] Rendering HomeClient');
-  console.log('[HOME_CLIENT] Best sellers received:', bestSellers.length);
-
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = () => {
-    console.log('[HOME_CLIENT] Next slide');
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   };
 
   const prevSlide = () => {
-    console.log('[HOME_CLIENT] Previous slide');
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
   useEffect(() => {
-    console.log('[HOME_CLIENT] Starting carousel auto-play (5s interval)');
     const interval = setInterval(nextSlide, 5000);
-    return () => {
-      console.log('[HOME_CLIENT] Clearing carousel interval');
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
-
-  console.log('[HOME_CLIENT] Current slide:', currentSlide);
 
   return (
     <div className="home">
@@ -81,10 +70,7 @@ export default function HomeClient({ bestSellers }: HomeClientProps) {
             <button
               key={index}
               className={`hero-carousel__dot ${index === currentSlide ? 'active' : ''}`}
-              onClick={() => {
-                console.log('[HOME_CLIENT] Dot clicked, go to slide:', index);
-                setCurrentSlide(index);
-              }}
+              onClick={() => setCurrentSlide(index)}
             />
           ))}
         </div>

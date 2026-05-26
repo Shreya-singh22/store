@@ -123,23 +123,9 @@ export interface StorefrontData {
 
 export async function fetchStorefront(): Promise<StorefrontData> {
   const apiUrl = getApiUrl();
-  console.log('[API] fetchStorefront called');
-  console.log('[API] URL:', apiUrl);
 
   const res = await fetch(apiUrl, { cache: 'no-store' });
-  console.log('[API] Response status:', res.status);
-
   const data = await res.json();
-  console.log('[API] Success:', data.success);
-
-  if (data.success) {
-    console.log('[API] Store:', data.store?.name);
-    console.log('[API] Products:', data.products?.length);
-    console.log('[API] Categories:', data.categories);
-    console.log('[API] Customization keys:', Object.keys(data.customization || {}));
-  } else {
-    console.log('[API] Error:', data.message);
-  }
 
   if (!data.success) throw new Error(data.message || 'Failed to fetch storefront');
   return data;
@@ -147,23 +133,9 @@ export async function fetchStorefront(): Promise<StorefrontData> {
 
 export async function fetchProduct(id: string): Promise<Product> {
   const apiUrl = `${getApiUrl()}/products/${id}`;
-  console.log('[API] fetchProduct called');
-  console.log('[API] URL:', apiUrl);
-  console.log('[API] Product ID:', id);
 
   const res = await fetch(apiUrl, { cache: 'no-store' });
-  console.log('[API] Response status:', res.status);
-
   const data = await res.json();
-  console.log('[API] Success:', data.success);
-
-  if (data.success) {
-    console.log('[API] Product:', data.product?.name);
-    console.log('[API] Price:', data.product?.price);
-    console.log('[API] Stock:', data.product?.stock);
-  } else {
-    console.log('[API] Error:', data.message);
-  }
 
   if (!data.success) throw new Error(data.message || `Failed to fetch product ${id}`);
   return data.product;
@@ -171,15 +143,9 @@ export async function fetchProduct(id: string): Promise<Product> {
 
 export async function fetchAnnouncements(): Promise<Announcement[]> {
   const apiUrl = `${getApiUrl()}/announcements`;
-  console.log('[API] fetchAnnouncements called');
-  console.log('[API] URL:', apiUrl);
 
   const res = await fetch(apiUrl, { cache: 'no-store' });
-  console.log('[API] Response status:', res.status);
-
   const data = await res.json();
-  console.log('[API] Success:', data.success);
-  console.log('[API] Announcements count:', data.announcements?.length);
 
   if (!data.success) throw new Error(data.message || 'Failed to fetch announcements');
   return data.announcements || [];
@@ -187,21 +153,9 @@ export async function fetchAnnouncements(): Promise<Announcement[]> {
 
 export async function fetchLegal(): Promise<LegalPage[]> {
   const apiUrl = `${getApiUrl()}/legal`;
-  console.log('[API] fetchLegal called');
-  console.log('[API] URL:', apiUrl);
 
   const res = await fetch(apiUrl, { cache: 'no-store' });
-  console.log('[API] Response status:', res.status);
-
   const data = await res.json();
-  console.log('[API] Success:', data.success);
-  console.log('[API] Legal pages count:', data.legalPages?.length);
-
-  if (data.legalPages) {
-    data.legalPages.forEach((page: LegalPage) => {
-      console.log('[API] Legal page type:', page.type);
-    });
-  }
 
   if (!data.success) throw new Error(data.message || 'Failed to fetch legal pages');
   return data.legalPages || [];
@@ -216,20 +170,13 @@ export async function submitReview(review: {
   content: string;
 }): Promise<{ message: string; review: Partial<ProductReview> }> {
   const apiUrl = `${getApiUrl()}/reviews`;
-  console.log('[API] submitReview called');
-  console.log('[API] URL:', apiUrl);
-  console.log('[API] Review data:', { productId: review.productId, rating: review.rating, title: review.title });
 
   const res = await fetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(review),
   });
-  console.log('[API] Response status:', res.status);
-
   const data = await res.json();
-  console.log('[API] Success:', data.success);
-  console.log('[API] Message:', data.message);
 
   if (!data.success) throw new Error(data.message || 'Failed to submit review');
   return data;
@@ -286,10 +233,6 @@ export interface OrderData {
 // ─── User Services ─────────────────────────────────────────────────────────────
 
 export async function getUserByPhone(phone: string): Promise<ApiResponse<UserData>> {
-  console.log('[API] getUserByPhone called');
-  console.log('[API] Phone:', phone);
-  console.log('[API] ⚠️ MOCK FUNCTION - returns dummy data');
-
   return {
     success: true,
     data: {
@@ -310,10 +253,6 @@ export async function createOrUpdateUser(data: {
   firstName?: string;
   lastName?: string;
 }): Promise<ApiResponse<UserData>> {
-  console.log('[API] createOrUpdateUser called');
-  console.log('[API] Data:', data);
-  console.log('[API] ⚠️ MOCK FUNCTION - returns dummy data');
-
   return {
     success: true,
     data: {
@@ -341,10 +280,6 @@ export async function createAddress(data: {
   phone?: string;
   isDefault: boolean;
 }): Promise<ApiResponse<AddressData>> {
-  console.log('[API] createAddress called');
-  console.log('[API] User ID:', data.userId);
-  console.log('[API] ⚠️ MOCK FUNCTION - returns dummy data');
-
   return {
     success: true,
     data: {
@@ -366,15 +301,7 @@ export async function createOrder(data: {
   email?: string;
   shippingAddress?: AddressData;
 }): Promise<ApiResponse<OrderData>> {
-  console.log('[API] createOrder called');
-  console.log('[API] User ID:', data.userId);
-  console.log('[API] Items:', data.items.length);
-  console.log('[API] Total:', data.totalAmount);
-  console.log('[API] Payment:', data.paymentMethod);
-  console.log('[API] ⚠️ MOCK FUNCTION - returns dummy order');
-
   const orderId = `ORD-${Date.now().toString(36).toUpperCase()}`;
-  console.log('[API] Generated Order ID:', orderId);
 
   return {
     success: true,
@@ -395,8 +322,7 @@ const CHECKOUT_SESSION_KEY = 'checkout_session';
 const SESSION_DURATION_MS = 60 * 60 * 1000;
 
 export function createCheckoutSession(phone: string): void {
-  console.log('[API] createCheckoutSession called');
-  console.log('[API] Phone:', phone);
+  if (typeof window === 'undefined') return;
 
   const session = {
     phone,
@@ -405,58 +331,36 @@ export function createCheckoutSession(phone: string): void {
     expiresAt: new Date(Date.now() + SESSION_DURATION_MS).toISOString(),
   };
 
-  console.log('[API] Session created:', session);
-
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(CHECKOUT_SESSION_KEY, JSON.stringify(session));
-    console.log('[API] Session saved to localStorage');
-  }
+  localStorage.setItem(CHECKOUT_SESSION_KEY, JSON.stringify(session));
 }
 
 export function validateCheckoutSession(): { valid: boolean; phone?: string } {
-  console.log('[API] validateCheckoutSession called');
-
   if (typeof window === 'undefined') {
-    console.log('[API] Server-side, returning invalid');
     return { valid: false };
   }
 
   try {
     const stored = localStorage.getItem(CHECKOUT_SESSION_KEY);
-    console.log('[API] Stored session:', stored);
-
     if (!stored) {
-      console.log('[API] No session found');
       return { valid: false };
     }
 
     const session = JSON.parse(stored);
-    const now = new Date();
     const expiresAt = new Date(session.expiresAt);
 
-    console.log('[API] Session expires:', expiresAt);
-    console.log('[API] Current time:', now);
-    console.log('[API] Is expired:', expiresAt < now);
-
-    if (expiresAt < now) {
+    if (expiresAt < new Date()) {
       localStorage.removeItem(CHECKOUT_SESSION_KEY);
-      console.log('[API] Session expired, removed');
       return { valid: false };
     }
 
-    console.log('[API] Session valid, phone:', session.phone);
     return { valid: true, phone: session.phone };
   } catch {
-    console.error('[API] Session parse error');
     return { valid: false };
   }
 }
 
 export function deleteCheckoutSession(): void {
-  console.log('[API] deleteCheckoutSession called');
-
   if (typeof window !== 'undefined') {
     localStorage.removeItem(CHECKOUT_SESSION_KEY);
-    console.log('[API] Session removed from localStorage');
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { fetchAnnouncements } from '@/lib/api';
 import './AnnouncementBar.css';
 
@@ -9,12 +9,14 @@ function pad(n: number) {
 }
 
 export default function AnnouncementBar() {
-  console.log('[ANNOUNCEMENT] Rendering AnnouncementBar');
-
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 3, seconds: 0 });
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     console.log('[ANNOUNCEMENT] Fetching announcements from API');
     fetchAnnouncements()
       .then((data) => {
@@ -27,7 +29,6 @@ export default function AnnouncementBar() {
   }, []);
 
   useEffect(() => {
-    console.log('[ANNOUNCEMENT] Starting countdown timer');
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         let { hours, minutes, seconds } = prev;
@@ -38,10 +39,7 @@ export default function AnnouncementBar() {
         return { hours, minutes, seconds };
       });
     }, 1000);
-    return () => {
-      console.log('[ANNOUNCEMENT] Clearing countdown timer');
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   const apiMessages = announcements.length > 0
@@ -57,7 +55,6 @@ export default function AnnouncementBar() {
   ];
 
   const messages = apiMessages.length > 0 ? apiMessages : staticMessages;
-  console.log('[ANNOUNCEMENT] Using', messages.length, 'messages (API:', apiMessages.length, '| Static:', staticMessages.length, ')');
 
   const barStyle = announcements[0]?.backgroundColor
     ? { backgroundColor: announcements[0].backgroundColor, color: announcements[0].textColor || '#fff' }

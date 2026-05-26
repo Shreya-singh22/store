@@ -21,8 +21,6 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  console.log('[PRODUCT_CARD] Rendering:', product.name, '(', product.id, ')');
-
   const [liked, setLiked] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const { addToCart } = useCart();
@@ -32,12 +30,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const rating = product.averageRating || 0;
   const discount = originalPrice ? Math.round(((originalPrice - product.price) / originalPrice) * 100) : 0;
 
-  console.log('[PRODUCT_CARD]', product.name, '| Price:', product.price, '| Compare:', originalPrice, '| Discount:', discount, '%');
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('[PRODUCT_CARD] Add to cart clicked for:', product.name);
     addToCart({
       id: product.id,
       name: product.name,
@@ -47,7 +42,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   const handleWishlistToggle = () => {
-    console.log('[PRODUCT_CARD] Wishlist toggle for:', product.name, '| Liked:', !liked);
     setLiked(!liked);
   };
 
@@ -59,7 +53,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           src={image}
           alt={product.name}
           className={`product-card__image ${imgLoaded ? 'loaded' : ''}`}
-          onLoad={() => console.log('[PRODUCT_CARD] Image loaded:', product.name)}
+          onLoad={() => setImgLoaded(true)}
           loading="lazy"
         />
         {discount > 0 && (
