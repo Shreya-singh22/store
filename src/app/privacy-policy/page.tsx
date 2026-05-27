@@ -1,5 +1,5 @@
 import { fetchLegal } from '@/lib/api';
-import './policy.css';
+import '@/app/policy.css';
 
 export default async function PrivacyPolicyPage() {
   let content = '';

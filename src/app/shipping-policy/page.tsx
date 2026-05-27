@@ -1,4 +1,4 @@
-import './policy.css';
+import '@/app/policy.css';
 
 export default function ShippingPolicyPage() {
   return (

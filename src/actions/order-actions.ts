@@ -149,8 +149,9 @@ export async function createCodOrder(data: {
         signal: controller.signal,
       });
       clearTimeout(timeout);
-    } catch (err) {
-      console.warn('External API sync skipped:', err.cause?.message || err.message);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.warn('External API sync skipped:', (error as any)?.cause?.message || error.message);
     }
   }
 
