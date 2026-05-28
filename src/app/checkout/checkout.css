@@ -198,11 +198,32 @@
 }
 
 /* OTP Input */
-.checkout__otp-input {
-  font-size: 24px !important;
+.checkout__otp-inputs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.checkout__otp-digit {
+  width: 56px;
+  height: 64px;
+  font-size: 28px !important;
   text-align: center;
-  letter-spacing: 12px;
   font-weight: 600;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+}
+
+.checkout__otp-digit:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+}
+
+.checkout__otp-digit.error {
+  border-color: #dc2626;
 }
 
 /* Resend */

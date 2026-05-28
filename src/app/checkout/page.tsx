@@ -39,7 +39,8 @@ export default function CheckoutPage() {
   const [deviceId, setDeviceId] = useState<string>('');
 
   const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '']);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [resendTimer, setResendTimer] = useState(0);
   const [user, setUser] = useState<any>(null);
@@ -173,6 +174,24 @@ export default function CheckoutPage() {
     }
   }, [resendTimer]);
 
+  const handleOtpChange = (index: number, value: string) => {
+    const digit = value.replace(/\D/g, '').slice(-1);
+    const newOtp = [...otp];
+    newOtp[index] = digit;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (digit && index < 3) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
   const handleSendOtp = async () => {
     if (!phone || phone.length < 10) {
       setError('Please enter a valid phone number');
@@ -180,12 +199,15 @@ export default function CheckoutPage() {
     }
     setIsLoading(true);
     setError(null);
+    setOtp(['', '', '', '']); // Reset OTP inputs
     try {
       const result = await sendOtp({ phone });
       if (result.success) {
         setSessionId((result as any).sessionId || null);
         setResendTimer(120);
         setStep('verify');
+        // Focus first OTP input after step change
+        setTimeout(() => otpRefs.current[0]?.focus(), 100);
       } else {
         throw new Error(result.message);
       }
@@ -197,14 +219,15 @@ export default function CheckoutPage() {
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp || otp.length !== 4) {
+    const otpCode = otp.join('');
+    if (!otpCode || otpCode.length !== 4) {
       setError('Please enter the 4-digit code');
       return;
     }
     setIsLoading(true);
     setError(null);
     try {
-      const result = await verifyOtp({ phone, code: otp, sessionId: sessionId || undefined });
+      const result = await verifyOtp({ phone, code: otpCode, sessionId: sessionId || undefined });
       if (result.success) {
         await createSession(phone, deviceId);
 
@@ -644,20 +667,27 @@ export default function CheckoutPage() {
               </div>
               <p className="checkout__step-desc">We&apos;ve sent a code to +91 {phone}</p>
 
-              <div className="checkout__field">
-                <label>Verification Code *</label>
-                <input
-                  type="text"
-                  maxLength={4}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  placeholder="0 0 0 0"
-                  className={`checkout__otp-input ${error ? 'error' : ''}`}
-                />
-                {error && <span className="checkout__error">{error}</span>}
+              <div className="checkout__otp-inputs">
+                {[0, 1, 2, 3].map((index) => (
+                  <input
+                    key={index}
+                    ref={(el) => {
+                      if (el) otpRefs.current[index] = el;
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={otp[index] || ''}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                    onFocus={(e) => e.target.select()}
+                    className={`checkout__otp-digit ${error ? 'error' : ''}`}
+                  />
+                ))}
               </div>
+              {error && <span className="checkout__error">{error}</span>}
 
-              <button className="checkout__continue-btn" onClick={handleVerifyOtp} disabled={isLoading || otp.length !== 4}>
+              <button className="checkout__continue-btn" onClick={handleVerifyOtp} disabled={isLoading || otp.join('').length !== 4}>
                 {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'VERIFY & CONTINUE'} <ChevronRight size={18} />
               </button>
 
@@ -852,6 +882,9 @@ export default function CheckoutPage() {
                   {error && <span className="checkout__error">{error}</span>}
                   {error && (error.includes('Unable to verify') || error.includes('stock')) ? (
                     <div className="checkout__payment-actions">
+                      <Link href="/catalogue" className="checkout__btn-secondary">
+                        Go Back to Shop
+                      </Link>
                       <button className="checkout__btn-secondary" onClick={() => { setPaymentMethod(null); setError(null); }}>
                         Choose Different Payment
                       </button>

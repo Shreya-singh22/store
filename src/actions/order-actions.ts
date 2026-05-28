@@ -362,3 +362,16 @@ export async function getOrderById(orderId: string) {
     return { success: false, message: error.message };
   }
 }
+
+export async function getOrdersByUser(userId: string) {
+  try {
+    const orders = await prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: { items: true },
+    });
+    return { success: true, data: orders };
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
+}
