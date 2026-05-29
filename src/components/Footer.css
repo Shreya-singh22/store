@@ -305,7 +305,8 @@
 
 @media (max-width: 768px) {
   .footer {
-    padding: 48px 24px 24px;
+    padding: 24px 16px;
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
   }
 
   .footer__row1 {
@@ -349,5 +350,8 @@
   .footer__powered-by {
     width: 100%;
     padding-top: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    margin-top: 0;
+    flex-shrink: 0;
   }
 }
