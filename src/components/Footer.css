@@ -224,4 +224,9 @@
     width: 100%;
     justify-content: flex-start;
   }
+
+  .footer__powered-by {
+    width: 100%;
+    padding-top: 16px;
+  }
 }
