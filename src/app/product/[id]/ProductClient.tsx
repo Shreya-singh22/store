@@ -59,11 +59,11 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
     ));
 
   const variantOptionKeys = product.variants?.length > 0
-    ? [...new Set(product.variants.flatMap((v: any) => Object.keys(v.options || {})))]
+    ? [...new Set<string>(product.variants.flatMap((v: any) => Object.keys(v.options || {})))]
     : [];
 
   const getOptionValues = (key: string) =>
-    [...new Set(product.variants.map((v: any) => v.options?.[key]).filter(Boolean))];
+    [...new Set<string>(product.variants.map((v: any) => v.options?.[key]).filter(Boolean))];
 
   const handleOptionChange = (key: string, value: string) => {
     const match = product.variants.find((v: any) =>
