@@ -69,12 +69,14 @@ export default function CheckoutPage() {
   const [payUData, setPayUData] = useState<any>(null);
   const launchAttemptedRef = useRef(false);
   const [orderSummary, setOrderSummary] = useState<{ items: typeof cartItems; subtotal: number; paymentMethod: string | null } | null>(null);
-  const [storeId, setStoreId] = useState<string>('');
+  const [storeId, setStoreId] = useState<string>(process.env.NEXT_PUBLIC_STORE_ID || '');
+  const [shippingAddress, setShippingAddress] = useState<any>(null); // Keep consistency if needed
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  // Fetch storeId from API on mount
+  // Fetch storeId from API on mount if not set from env
   useEffect(() => {
+    if (storeId) return;
     fetchStorefront()
       .then((data) => {
         if (data.store?.id) {
@@ -82,7 +84,7 @@ export default function CheckoutPage() {
         }
       })
       .catch((err) => console.error('[Checkout] Failed to fetch store:', err));
-  }, []);
+  }, [storeId]);
 
   // Launch PayU Checkout Plus in iframe mode (SPA-like experience)
   useEffect(() => {

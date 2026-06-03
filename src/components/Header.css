@@ -65,6 +65,16 @@
   width: auto;
 }
 
+.header__logo-text {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 /* Row 3: Navigation */
 .header__nav {
   border-top: 1px solid #f0f0f0;

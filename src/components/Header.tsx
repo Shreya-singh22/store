@@ -63,9 +63,14 @@ export default function Header({ initialCustomization }: HeaderProps) {
   };
 
   const [logoUrl, setLogoUrl] = useState(getInitialLogo);
+  const [logoError, setLogoError] = useState(false);
   const [storeName, setStoreName] = useState(getInitialStoreName);
   const [navLinks, setNavLinks] = useState<{ label: string; path: string }[]>(getInitialNavLinks);
   const hasFetched = useRef(false);
+
+  useEffect(() => {
+    setLogoError(false);
+  }, [logoUrl]);
 
   useEffect(() => {
     if (initialCustomization) {
@@ -190,11 +195,16 @@ export default function Header({ initialCustomization }: HeaderProps) {
           </div>
 
           <Link href="/" className="header__logo">
-            <img
-              src={logoUrl}
-              alt={storeName}
-              className="header__logo-img"
-            />
+            {logoError || !logoUrl ? (
+              <span className="header__logo-text">{storeName.toUpperCase()}</span>
+            ) : (
+              <img
+                src={logoUrl}
+                alt={storeName}
+                className="header__logo-img"
+                onError={() => setLogoError(true)}
+              />
+            )}
           </Link>
 
           <div className="header__right">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Star, Heart, ShoppingBag, Truck, Shield, RotateCcw } from 'lucide-react';
 import { useCart } from '@/components/CartProvider';
 import ProductCard from '@/components/ProductCard';
@@ -19,6 +19,14 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
   const [activeTab, setActiveTab] = useState('description');
   const [imageLoading, setImageLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // Check if image is already loaded (e.g. from cache) upon mounting or changing image index
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      setImageLoading(false);
+    }
+  }, [selectedImageIndex]);
 
   useEffect(() => {
     if (product.variants?.length > 0) {
@@ -87,6 +95,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
                 </div>
               )}
               <img
+                ref={imgRef}
                 src={product.images?.[selectedImageIndex] || product.images?.[0] || 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80'}
                 alt={product.name}
                 onLoad={() => setImageLoading(false)}

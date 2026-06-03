@@ -37,6 +37,16 @@
   width: auto;
 }
 
+.footer__logo-text {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #fff;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .footer__brand-name {
   font-family: 'Inter', sans-serif;
   font-size: 20px;

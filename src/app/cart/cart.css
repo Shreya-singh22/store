@@ -285,9 +285,11 @@
 }
 
 .cart__checkout-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 16px;
+  height: 50px;
   background: var(--gold);
   color: #fff;
   text-align: center;
@@ -296,12 +298,15 @@
   font-weight: 600;
   letter-spacing: 1px;
   margin-top: 20px;
-  border-radius: 4px;
-  transition: background 200ms var(--ease-out), transform 160ms var(--ease-out);
+  border-radius: 8px;
+  transition: all 200ms var(--ease-out);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .cart__checkout-btn:hover {
   background: var(--gold-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .cart__checkout-btn:active {
@@ -309,20 +314,42 @@
 }
 
 .cart__continue-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 14px;
-  background: none;
-  color: var(--text-muted);
+  height: 46px;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-primary);
   text-align: center;
   text-decoration: none;
   font-size: 13px;
+  font-weight: 600;
   margin-top: 12px;
-  transition: color 200ms var(--ease-out);
+  border-radius: 8px;
+  transition: all 200ms var(--ease-out);
 }
 
 .cart__continue-btn:hover {
-  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border-color: var(--gold-light);
+  color: var(--gold);
+}
+
+.cart__powered-by {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 20px;
+  font-size: 12px;
+  color: #888;
+}
+
+.cart__evoc-logo {
+  height: 20px;
+  width: auto;
 }
 
 /* Responsive */

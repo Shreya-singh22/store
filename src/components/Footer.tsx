@@ -85,7 +85,12 @@ export default function Footer({ initialCustomization }: FooterProps) {
 
   const [storeName, setStoreName] = useState(() => initialCustomization?.headerConfig?.storeName || DEFAULT_NAME);
   const [logoUrl, setLogoUrl] = useState(getInitialLogo);
+  const [logoError, setLogoError] = useState(false);
   const [brandDesc, setBrandDesc] = useState(() => initialCustomization?.aboutSection?.content || DEFAULT_DESC);
+
+  useEffect(() => {
+    setLogoError(false);
+  }, [logoUrl]);
   const [contactInfo, setContactInfo] = useState(() => {
     // Support footerContent structure from admin panel
     const fc = initialCustomization?.footerContent;
@@ -220,7 +225,16 @@ export default function Footer({ initialCustomization }: FooterProps) {
       <div className="footer__row1">
         <div className="footer__brand">
           <div className="footer__logo-wrap">
-            <img src={logoUrl} alt={storeName} className="footer__logo" />
+            {logoError || !logoUrl ? (
+              <span className="footer__logo-text">{storeName.toUpperCase()}</span>
+            ) : (
+              <img
+                src={logoUrl}
+                alt={storeName}
+                className="footer__logo"
+                onError={() => setLogoError(true)}
+              />
+            )}
           </div>
           <h3 className="footer__brand-name">{storeName}</h3>
           <p className="footer__brand-desc">{brandDesc}</p>
