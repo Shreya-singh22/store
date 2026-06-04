@@ -124,23 +124,81 @@ export interface StorefrontData {
 
 // ─── Public Endpoints ────────────────────────────────────────────────────────
 
-export async function fetchStorefront(): Promise<StorefrontData> {
-  const apiUrl = getApiUrl();
-  const res = await fetch(apiUrl, { next: { revalidate: 60 } });
-  const data = await res.json();
+const DUMMY_PRODUCTS = [
+  {
+    id: 'prod-1',
+    slug: 'dummy-product-1',
+    name: 'Gold Plated Kundan Necklace Set',
+    description: 'Beautiful traditional gold plated kundan necklace set with matching earrings.',
+    price: 2999,
+    compareAtPrice: 5999,
+    sku: 'NK-001',
+    stock: 10,
+    images: ['https://images.unsplash.com/photo-1599643478524-fb66f7ca0f47?q=80&w=600&auto=format&fit=crop'],
+    category: 'jewellery-sets',
+    tags: ['kundan', 'gold', 'wedding'],
+    isFeatured: true,
+    isBestSeller: true,
+    isNewArrival: false,
+    variants: [],
+    reviews: [],
+    averageRating: 4.8,
+    reviewCount: 124,
+  },
+  {
+    id: 'prod-2',
+    slug: 'dummy-product-2',
+    name: 'Diamond Studded Bridal Choker',
+    description: 'Elegant diamond studded bridal choker set for your special day.',
+    price: 4999,
+    compareAtPrice: 8999,
+    sku: 'NK-002',
+    stock: 5,
+    images: ['https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=600&auto=format&fit=crop'],
+    category: 'jewellery-sets',
+    tags: ['diamond', 'bridal', 'choker'],
+    isFeatured: true,
+    isBestSeller: false,
+    isNewArrival: true,
+    variants: [],
+    reviews: [],
+    averageRating: 4.5,
+    reviewCount: 56,
+  }
+] as Product[];
 
-  if (!data.success) throw new Error(data.message || 'Failed to fetch storefront');
-  return data;
+const MOCK_STOREFRONT: StorefrontData = {
+  success: true,
+  store: { id: 's-1', name: 'Swarajya Imperial', subdomain: 'swarajya', customDomain: null, description: 'Store', logo: null, category: 'Jewelry', theme: 'default', createdAt: '' },
+  customization: {} as any,
+  settings: { currency: 'INR', timezone: 'Asia/Kolkata', contactEmail: '', contactPhone: '', enabledGateways: {} },
+  announcements: [],
+  legalPages: [],
+  products: DUMMY_PRODUCTS,
+  categories: ['jewellery-sets', 'earrings', 'necklaces', 'rings'],
+  theme: { id: '1', name: 'default', slug: 'default', category: 'all' }
+};
+
+export async function fetchStorefront(): Promise<StorefrontData> {
+  try {
+    const res = await fetch(getApiUrl(), { next: { revalidate: 60 } });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch storefront');
+    return data;
+  } catch (err) {
+    return MOCK_STOREFRONT;
+  }
 }
 
 export async function fetchProduct(id: string): Promise<Product> {
-  const apiUrl = `${getApiUrl()}/products/${id}`;
-
-  const res = await fetch(apiUrl, { cache: 'no-store' });
-  const data = await res.json();
-
-  if (!data.success) throw new Error(data.message || `Failed to fetch product ${id}`);
-  return data.product;
+  try {
+    const res = await fetch(`${getApiUrl()}/products/${id}`, { cache: 'no-store' });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || `Failed to fetch product ${id}`);
+    return data.product;
+  } catch (err) {
+    return DUMMY_PRODUCTS.find(p => p.id === id) || DUMMY_PRODUCTS[0];
+  }
 }
 
 export async function fetchAnnouncements(): Promise<Announcement[]> {

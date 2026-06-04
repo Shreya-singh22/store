@@ -70,7 +70,6 @@ export default function CheckoutPage() {
   const launchAttemptedRef = useRef(false);
   const [orderSummary, setOrderSummary] = useState<{ items: typeof cartItems; subtotal: number; paymentMethod: string | null } | null>(null);
   const [storeId, setStoreId] = useState<string>(process.env.NEXT_PUBLIC_STORE_ID || '');
-  const [shippingAddress, setShippingAddress] = useState<any>(null); // Keep consistency if needed
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -639,12 +638,11 @@ export default function CheckoutPage() {
           )}
 
           {step === 'identify' && (
-            <section className="checkout__section">
+            <section className="checkout__section checkout__section--sticky">
               <div className="checkout__step-header">
                 <Phone size={24} />
                 <h2>VERIFY PHONE NUMBER</h2>
               </div>
-              <p className="checkout__step-desc">Enter your phone number to proceed with your order</p>
 
               <div className="checkout__field">
                 <label>Phone Number *</label>
@@ -662,11 +660,17 @@ export default function CheckoutPage() {
               <button className="checkout__continue-btn" onClick={handleSendOtp} disabled={isLoading}>
                 {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'SEND OTP'} <ChevronRight size={18} />
               </button>
+              <div className="checkout__powered-by-wrapper">
+                <div className="checkout__powered-by">
+                  <span className="checkout__powered-by-text">Powered by</span>
+                  <img src="/evoc-logo.png" alt="EvocLabs" className="checkout__evoc-logo" />
+                </div>
+              </div>
             </section>
           )}
 
           {step === 'verify' && (
-            <section className="checkout__section">
+            <section className="checkout__section checkout__section--sticky">
               <div className="checkout__step-header">
                 <Phone size={24} />
                 <h2>ENTER OTP</h2>
@@ -693,13 +697,19 @@ export default function CheckoutPage() {
               </div>
               {error && <span className="checkout__error">{error}</span>}
 
-              <button className="checkout__continue-btn" onClick={handleVerifyOtp} disabled={isLoading || otp.join('').length !== 4}>
-                {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'VERIFY & CONTINUE'} <ChevronRight size={18} />
-              </button>
-
               <button className="checkout__resend" onClick={handleSendOtp} disabled={resendTimer > 0 || isLoading}>
                 {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
               </button>
+
+              <button className="checkout__continue-btn" onClick={handleVerifyOtp} disabled={isLoading || otp.join('').length !== 4}>
+                {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'VERIFY & CONTINUE'} <ChevronRight size={18} />
+              </button>
+              <div className="checkout__powered-by-wrapper">
+                <div className="checkout__powered-by">
+                  <span className="checkout__powered-by-text">Powered by</span>
+                  <img src="/evoc-logo.png" alt="EvocLabs" className="checkout__evoc-logo" />
+                </div>
+              </div>
             </section>
           )}
 
@@ -838,13 +848,17 @@ export default function CheckoutPage() {
 
               {error && <span className="checkout__error">{error}</span>}
 
-              <button className="checkout__continue-btn" onClick={handleContinueToPayment} disabled={isLoading || !selectedAddress}>
-                {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'CONTINUE TO PAYMENT'} <ChevronRight size={18} />
-              </button>
+              <div className="checkout__mobile-sticky-bottom">
+                <button className="checkout__continue-btn" onClick={handleContinueToPayment} disabled={isLoading || !selectedAddress}>
+                  {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'CONTINUE TO PAYMENT'} <ChevronRight size={18} />
+                </button>
 
-              <div className="checkout__powered-by">
-                <span>Powered by</span>
-                <img src="/evoc-logo.png" alt="EvocLabs" className="checkout__evoc-logo" />
+                <div className="checkout__powered-by-wrapper">
+                  <div className="checkout__powered-by">
+                    <span>Powered by</span>
+                    <img src="/evoc-logo.png" alt="EvocLabs" className="checkout__evoc-logo" />
+                  </div>
+                </div>
               </div>
             </section>
           )}
@@ -884,52 +898,61 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              {(paymentMethod === 'COD' || paymentMethod === 'PAYU') && (
-                <div className="checkout__powered-by">
-                  <span>Powered by</span>
-                  <img src="/evoc-logo.png" alt="EvocLabs" className="checkout__evoc-logo" />
+              {paymentMethod === 'COD' && (
+                <div className="checkout__payment-inline-wrapper">
+                  <div className="checkout__payment-confirm">
+                    <div className="checkout__cod-info">
+                      <p>Pay with cash when your order arrives.</p>
+                      <p className="checkout__cod-fee">A fee of Rs. {COD_FEE} applies.</p>
+                    </div>
+                    {error && <span className="checkout__error">{error}</span>}
+                    {error && (error.includes('Unable to verify') || error.includes('stock')) ? (
+                      <div className="checkout__payment-actions">
+                        <Link href="/catalogue" className="checkout__btn-secondary">
+                          Go Back to Shop
+                        </Link>
+                        <button className="checkout__btn-secondary" onClick={() => { setPaymentMethod(null); setError(null); }}>
+                          Choose Different Payment
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="checkout__payment-actions">
+                        <button className="checkout__btn-secondary" onClick={() => setPaymentMethod(null)}>Choose Different Payment</button>
+                        <button className="checkout__place-order-btn" onClick={handleCreateCodOrder} disabled={isLoading}>
+                          {isLoading ? <Loader2 className="animate-spin" size={18} /> : `CONFIRM ORDER - ₹${(subtotal + COD_FEE).toLocaleString()}`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="checkout__powered-by-wrapper" style={{ marginTop: '24px' }}>
+                    <div className="checkout__powered-by">
+                      <span>Powered by</span>
+                      <img src="/evoc-logo.png" alt="EvocLabs" className="checkout__evoc-logo" />
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {paymentMethod === 'COD' && (
-                <div className="checkout__payment-confirm">
-                  <div className="checkout__cod-info">
-                    <p>Pay with cash when your order arrives.</p>
-                    <p className="checkout__cod-fee">A fee of Rs. {COD_FEE} applies.</p>
-                  </div>
-                  {error && <span className="checkout__error">{error}</span>}
-                  {error && (error.includes('Unable to verify') || error.includes('stock')) ? (
-                    <div className="checkout__payment-actions">
-                      <Link href="/catalogue" className="checkout__btn-secondary">
-                        Go Back to Shop
-                      </Link>
-                      <button className="checkout__btn-secondary" onClick={() => { setPaymentMethod(null); setError(null); }}>
-                        Choose Different Payment
-                      </button>
+              {paymentMethod === 'PAYU' && !payUData && (
+                <div className="checkout__payment-inline-wrapper">
+                  <div className="checkout__payment-confirm">
+                    <div className="checkout__online-info">
+                      <p>Pay securely via PayU.</p>
+                      <p className="checkout__secure-badge">🔒 256-bit SSL Encrypted</p>
                     </div>
-                  ) : (
+                    {error && <span className="checkout__error">{error}</span>}
                     <div className="checkout__payment-actions">
                       <button className="checkout__btn-secondary" onClick={() => setPaymentMethod(null)}>Choose Different Payment</button>
-                      <button className="checkout__place-order-btn" onClick={handleCreateCodOrder} disabled={isLoading}>
-                        {isLoading ? <Loader2 className="animate-spin" size={18} /> : `CONFIRM ORDER - ₹${(subtotal + COD_FEE).toLocaleString()}`}
+                      <button className="checkout__place-order-btn checkout__place-order-btn--online" onClick={handleInitiatePayU} disabled={isLoading}>
+                        {isLoading ? <Loader2 className="animate-spin" size={18} /> : `PAY NOW - ₹${subtotal.toLocaleString()}`}
                       </button>
                     </div>
-                  )}
-                </div>
-              )}
-
-              {paymentMethod === 'PAYU' && (
-                <div className="checkout__payment-confirm">
-                  <div className="checkout__online-info">
-                    <p>Pay securely via PayU.</p>
-                    <p className="checkout__secure-badge">🔒 256-bit SSL Encrypted</p>
                   </div>
-                  {error && <span className="checkout__error">{error}</span>}
-                  <div className="checkout__payment-actions">
-                    <button className="checkout__btn-secondary" onClick={() => setPaymentMethod(null)}>Choose Different Payment</button>
-                    <button className="checkout__place-order-btn checkout__place-order-btn--online" onClick={handleInitiatePayU} disabled={isLoading}>
-                      {isLoading ? <Loader2 className="animate-spin" size={18} /> : `PAY NOW - ₹${subtotal.toLocaleString()}`}
-                    </button>
+                  <div className="checkout__powered-by-wrapper" style={{ marginTop: '24px' }}>
+                    <div className="checkout__powered-by">
+                      <span>Powered by</span>
+                      <img src="/evoc-logo.png" alt="EvocLabs" className="checkout__evoc-logo" />
+                    </div>
                   </div>
                 </div>
               )}
@@ -971,9 +994,11 @@ export default function CheckoutPage() {
             <span><RefreshCw size={14} /> Easy Returns</span>
           </div>
 
-          <div className="checkout__powered-by">
-            <span>Powered by</span>
-            <img src="/evoc-logo.png" alt="EvocLabs" className="checkout__evoc-logo" />
+          <div className="checkout__powered-by-wrapper">
+            <div className="checkout__powered-by">
+              <span>Powered by</span>
+              <img src="/evoc-logo.png" alt="EvocLabs" className="checkout__evoc-logo" />
+            </div>
           </div>
         </div>
       </div>

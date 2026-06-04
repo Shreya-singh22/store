@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Script from "next/script";
 import { Inter, Playfair_Display } from "next/font/google";
+import PageLoader from "@/components/PageLoader";
 
 import { fetchStorefront } from "@/lib/api";
 import PreviewBridge from "@/components/PreviewBridge";
@@ -60,6 +61,7 @@ export default async function RootLayout({
         <link rel="preload" as="image" href="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=80" />
       </head>
       <body className={`${inter.variable} ${playfair.variable}`}>
+        <PageLoader />
         <PreviewBridge initialCustomization={customization} />
         <Script
           src={payuScriptUrl}

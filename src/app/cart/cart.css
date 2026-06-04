@@ -58,9 +58,9 @@
 /* Layout */
 .cart__layout {
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 32px;
-  max-width: 1200px;
+  grid-template-columns: 1.3fr 380px;
+  gap: 40px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -352,6 +352,37 @@
   width: auto;
 }
 
+.cart__powered-by-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.cart__powered-by {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #f0f0f0;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #888;
+  margin: 0 auto;
+}
+
+.cart__powered-by-text {
+  font-size: 12px;
+  color: #888;
+}
+
+.cart__evoc-logo {
+  height: 24px;
+  width: auto;
+  filter: invert(41%) sepia(99%) saturate(4051%) hue-rotate(185deg) brightness(95%) contrast(101%);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .cart__layout {
@@ -363,9 +394,9 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .cart {
-    padding: 16px 12px;
+    padding: 24px 16px 180px 16px;
   }
 
   .cart__title {
@@ -503,5 +534,20 @@
 
   .cart__evoc-logo {
     height: 22px;
+  }
+
+  .cart__summary {
+    padding-bottom: 0px;
+  }
+
+  .cart__mobile-sticky-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 16px;
+    z-index: 100;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
   }
 }

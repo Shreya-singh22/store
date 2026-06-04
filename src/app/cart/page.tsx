@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Trash2, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/components/CartProvider';
-import './cart.css';
+import './Cart.css';
 
 export default function CartPage() {
   console.log('[PAGE:Cart] Rendering CartPage');
@@ -124,27 +124,31 @@ export default function CartPage() {
 
           <div className="cart__summary-divider" />
 
-          <div className="cart__summary-row cart__summary-row--total">
-            <span>Total</span>
-            <span>{formatPrice(finalTotal > 0 ? finalTotal : 0)}</span>
-          </div>
-
           <div className="cart__promo-input">
             <input type="text" placeholder="Promo code" />
             <button className="cart__promo-btn">APPLY</button>
           </div>
 
-          <Link href="/checkout" className="cart__checkout-btn">
-            PROCEED TO CHECKOUT
-          </Link>
-
           <Link href="/catalogue" className="cart__continue-btn">
             CONTINUE SHOPPING
           </Link>
 
-          <div className="cart__powered-by">
-            <span className="cart__powered-by-text">Powered by</span>
-            <img src="/evoc-logo.png" alt="EvocLabs" className="cart__evoc-logo" />
+          <div className="cart__mobile-sticky-bottom">
+            <div className="cart__summary-row cart__summary-row--total">
+              <span>Total</span>
+              <span>{formatPrice(finalTotal > 0 ? finalTotal : 0)}</span>
+            </div>
+
+            <Link href="/checkout" className="cart__checkout-btn">
+              PROCEED TO CHECKOUT
+            </Link>
+
+            <div className="cart__powered-by-wrapper">
+              <div className="cart__powered-by">
+                <span className="cart__powered-by-text">Powered by</span>
+                <img src="/evoc-logo.png" alt="EvocLabs" className="cart__evoc-logo" />
+              </div>
+            </div>
           </div>
         </div>
       </div>

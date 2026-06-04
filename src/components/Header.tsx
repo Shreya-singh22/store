@@ -261,35 +261,6 @@ export default function Header({ initialCustomization }: HeaderProps) {
         </div>
       )}
 
-      {/* Mobile Bottom Tab Bar */}
-      <div className="header__mobile-tabs">
-        <div className="header__mobile-tabs-inner">
-          <Link href="/" className="header__mobile-tab header__mobile-tab--active">
-            <HomeIcon />
-            <span>Home</span>
-          </Link>
-          <Link href="/orders" className="header__mobile-tab">
-            <User size={22} strokeWidth={1.5} />
-            <span>Orders</span>
-          </Link>
-          <button
-            className="header__mobile-tab"
-            onClick={() => setMobileMenuOpen(true)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            <Menu size={22} strokeWidth={1.5} />
-            <span>Browse</span>
-          </button>
-          <button
-            className="header__mobile-tab"
-            onClick={() => setSearchOpen(true)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            <Search size={22} strokeWidth={1.5} />
-            <span>Search</span>
-          </button>
-        </div>
-      </div>
     </>
   );
 }

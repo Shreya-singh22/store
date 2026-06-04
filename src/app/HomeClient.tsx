@@ -107,12 +107,12 @@ export default function HomeClient({ bestSellers, customization, categories }: H
       clearTimeout(timerId);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [heroSlides.length]); // Added dependency to make it robust
+  }, [heroSlides.length]);
 
   return (
     <div className="home">
       {(customization?.homePageConfig?.heroEnabled !== false) && (
-        <section className="hero-carousel">
+        <section className="hero-carousel animate-slide-up delay-200">
           <div className="hero-carousel__track" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
             {heroSlides.map((slide, index) => (
               <div key={slide.id} className="hero-carousel__slide">
@@ -158,7 +158,7 @@ export default function HomeClient({ bestSellers, customization, categories }: H
 
       {(customization?.homePageConfig?.categoriesEnabled !== false) && (
         <>
-          <section className="brand-category">
+          <section className="brand-category animate-slide-up delay-300">
             <h2 className="section-title">BRAND CATEGORY</h2>
             <div className="brand-category__grid">
               {brandCategories.map((cat) => (
@@ -172,7 +172,7 @@ export default function HomeClient({ bestSellers, customization, categories }: H
             </div>
           </section>
 
-          <section className="shop-category">
+          <section className="shop-category animate-slide-up delay-400">
             <h2 className="section-title">SHOP BY CATEGORY</h2>
             <div className="shop-category__grid">
               {brandCategories.map((cat) => (
@@ -189,7 +189,7 @@ export default function HomeClient({ bestSellers, customization, categories }: H
       )}
 
       {videoUrl && (
-        <section className="brand-video">
+        <section className="brand-video animate-slide-up delay-500">
           <div className="brand-video__wrapper">
             <video autoPlay muted loop playsInline className="brand-video__player">
               <source src={videoUrl} type="video/mp4" />
@@ -200,7 +200,7 @@ export default function HomeClient({ bestSellers, customization, categories }: H
 
       {(customization?.homePageConfig?.featuredEnabled !== false) && (
         bestSellers.length > 0 ? (
-          <section className="featured-collection">
+          <section className="featured-collection animate-slide-up delay-600">
             <h2 className="section-title">ALL PRODUCTS</h2>
             <div className="featured-collection__grid">
               {bestSellers.map((product) => (
@@ -209,7 +209,7 @@ export default function HomeClient({ bestSellers, customization, categories }: H
             </div>
           </section>
         ) : (
-          <section className="featured-collection">
+          <section className="featured-collection animate-slide-up delay-600">
             <h2 className="section-title">ALL PRODUCTS</h2>
             <p style={{ textAlign: 'center', color: '#888', padding: '40px' }}>No products available</p>
           </section>
