@@ -2,7 +2,7 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 COPY . .
 # Disable Next.js telemetry during build
 ENV NEXT_TELEMETRY_DISABLED=1
