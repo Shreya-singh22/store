@@ -1,9 +1,11 @@
 import "./globals.css";
 import { CartProvider } from "@/components/CartProvider";
+import { WishlistProvider } from "@/components/WishlistProvider";
 import CartDrawer from "@/components/CartDrawer";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BottomNav from "@/components/BottomNav";
 import Script from "next/script";
 import { Inter, Playfair_Display } from "next/font/google";
 import PageLoader from "@/components/PageLoader";
@@ -70,13 +72,16 @@ export default async function RootLayout({
           strategy="afterInteractive"
           id="payu-bolt"
         />
-        <CartProvider>
-          <CartDrawer />
-          <AnnouncementBar initialCustomization={customization} />
-          <Header initialCustomization={customization} />
-          <main>{children}</main>
-          <Footer initialCustomization={customization} />
-        </CartProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <CartDrawer />
+            <AnnouncementBar initialCustomization={customization} />
+            <Header initialCustomization={customization} />
+            <main>{children}</main>
+            <Footer initialCustomization={customization} />
+            <BottomNav />
+          </CartProvider>
+        </WishlistProvider>
       </body>
     </html>
   );

@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
+import ProductsSection from '@/components/ProductsSection';
 import ReelsSection from '@/components/ReelsSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
+import type { HydratedSection } from '@/lib/products';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './page.css';
 
@@ -42,12 +44,18 @@ interface Customization {
     enabled?: boolean;
     reels?: Array<{ id: string; title: string; sub: string; category: string; videoUrl: string; ctaLink?: string }>;
   };
+  testimonialsSection?: {
+    enabled?: boolean;
+    title?: string;
+    testimonials?: Array<{ id: string; name: string; description: string; image?: string; rating?: number; date?: string; ctaLink?: string }>;
+  };
 }
 
 interface HomeClientProps {
   bestSellers: Product[];
   customization: Customization | null;
   categories: string[];
+  productSections?: HydratedSection[];
 }
 
 function buildHeroSlides(customization: any | null) {
@@ -118,7 +126,7 @@ function buildVideoUrl(customization: Customization | null) {
     'https://d1311wbk6unapo.cloudfront.net/NushopCatalogue/tr:q-50/686907a872a04e21d2c32db3/cat_vid/1755514917928_FM3UBAP14Z_2025-08-18_1.mp4';
 }
 
-export default function HomeClient({ bestSellers, customization, categories }: HomeClientProps) {
+export default function HomeClient({ bestSellers, customization, categories, productSections = [] }: HomeClientProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [customizationState, setCustomizationState] = useState(customization);
 
@@ -213,7 +221,7 @@ export default function HomeClient({ bestSellers, customization, categories }: H
       {(customizationState?.homePageConfig?.categoriesEnabled !== false) && brandCategories.length > 0 && (
         <>
           <section className="brand-category animate-slide-up delay-300">
-            <h2 className="section-title">BRAND CATEGORY</h2>
+            <h2 className="section-title">SHOP BY COLLECTIONS</h2>
             <div className="brand-category__grid">
               {brandCategories.map((cat) => (
                 <Link key={cat.name} href={cat.path} className="brand-category__item">
@@ -267,21 +275,33 @@ export default function HomeClient({ bestSellers, customization, categories }: H
         )
       )}
 
-      {(customizationState?.homePageConfig?.featuredEnabled !== false) && (
-        bestSellers.length > 0 ? (
-          <section className="featured-collection animate-slide-up delay-600">
-            <h2 className="section-title">ALL PRODUCTS</h2>
-            <div className="featured-collection__grid">
-              {bestSellers.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </section>
-        ) : (
-          <section className="featured-collection animate-slide-up delay-600">
-            <h2 className="section-title">ALL PRODUCTS</h2>
-            <p style={{ textAlign: 'center', color: '#888', padding: '40px' }}>No products available</p>
-          </section>
+      {/* Dynamic product sections from CMS config */}
+      {productSections.length > 0 ? (
+        productSections.map((section) => (
+          <ProductsSection
+            key={section.id}
+            title={section.title}
+            subtitle={section.subtitle}
+            products={section.products}
+          />
+        ))
+      ) : (
+        (customizationState?.homePageConfig?.featuredEnabled !== false) && (
+          bestSellers.length > 0 ? (
+            <section className="featured-collection animate-slide-up delay-600">
+              <h2 className="section-title">ALL PRODUCTS</h2>
+              <div className="featured-collection__grid">
+                {bestSellers.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </section>
+          ) : (
+            <section className="featured-collection animate-slide-up delay-600">
+              <h2 className="section-title">ALL PRODUCTS</h2>
+              <p style={{ textAlign: 'center', color: '#888', padding: '40px' }}>No products available</p>
+            </section>
+          )
         )
       )}
 

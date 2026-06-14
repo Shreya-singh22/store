@@ -7,6 +7,7 @@ import './ProductCard.css';
 
 interface Product {
   id: string;
+  slug?: string;
   name: string;
   price: number;
   compareAtPrice?: number;
@@ -47,7 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className="product-card">
-      <a href={`/product/${product.id}`} className="product-card__image-wrap">
+      <a href={`/product/${product.slug || product.id}`} className="product-card__image-wrap">
         {!imgLoaded && <div className="product-card__skeleton" />}
         <img
           src={image}
@@ -75,7 +76,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </button>
 
       <div className="product-card__info">
-        <a href={`/product/${product.id}`} className="product-card__name">
+        <a href={`/product/${product.slug || product.id}`} className="product-card__name">
           {product.name}
         </a>
 

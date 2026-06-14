@@ -28,7 +28,7 @@ export interface Customization {
   navLinks: { label: string; href: string }[];
   ctaButtons: any[];
   features: { title: string; description: string; icon: string }[];
-  productSections: { id: string; type: string; title: string; limit: number }[];
+  productSections: { id: string; type: string; title: string; subtitle?: string; categoryFilter?: string; limit: number }[];
   newsletter: { heading: string; subtext: string };
   announcementBar: { text: string };
   metaTitle: string;
