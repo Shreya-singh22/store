@@ -1,5 +1,6 @@
 import "./globals.css";
 import { CartProvider } from "@/components/CartProvider";
+import { WishlistProvider } from "@/components/WishlistProvider";
 import CartDrawer from "@/components/CartDrawer";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
@@ -71,14 +72,16 @@ export default async function RootLayout({
           strategy="afterInteractive"
           id="payu-bolt"
         />
-        <CartProvider>
-          <CartDrawer />
-          <AnnouncementBar initialCustomization={customization} />
-          <Header initialCustomization={customization} />
-          <main>{children}</main>
-          <Footer initialCustomization={customization} />
-          <BottomNav />
-        </CartProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <CartDrawer />
+            <AnnouncementBar initialCustomization={customization} />
+            <Header initialCustomization={customization} />
+            <main>{children}</main>
+            <Footer initialCustomization={customization} />
+            <BottomNav />
+          </CartProvider>
+        </WishlistProvider>
       </body>
     </html>
   );

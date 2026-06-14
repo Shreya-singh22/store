@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Grid2X2, ShoppingBag, User, Heart } from 'lucide-react';
 import { useCart } from './CartProvider';
+import { useWishlist } from './WishlistProvider';
 import './BottomNav.css';
 
 const NAV_ITEMS = [
@@ -41,7 +42,8 @@ const NAV_ITEMS = [
 
 export default function BottomNav() {
     const pathname = usePathname();
-    const { cartCount, isHydrated } = useCart();
+    const { cartCount, isHydrated: cartHydrated } = useCart();
+    const { wishlistCount, isHydrated: wishlistHydrated } = useWishlist();
 
     const isActive = (href: string, exact: boolean) => {
         if (exact) return pathname === href;
@@ -53,6 +55,7 @@ export default function BottomNav() {
             {NAV_ITEMS.map(({ label, href, icon: Icon, exact }) => {
                 const active = isActive(href, exact);
                 const isCart = href === '/cart';
+                const isWishlist = href === '/wishlist';
 
                 return (
                     <Link
@@ -68,8 +71,11 @@ export default function BottomNav() {
                                 strokeWidth={active ? 2 : 1.5}
                                 className="bottom-nav__icon"
                             />
-                            {isCart && isHydrated && cartCount > 0 && (
+                            {isCart && cartHydrated && cartCount > 0 && (
                                 <span className="bottom-nav__badge">{cartCount > 9 ? '9+' : cartCount}</span>
+                            )}
+                            {isWishlist && wishlistHydrated && wishlistCount > 0 && (
+                                <span className="bottom-nav__badge">{wishlistCount > 9 ? '9+' : wishlistCount}</span>
                             )}
                         </span>
                         <span className="bottom-nav__label">{label}</span>
