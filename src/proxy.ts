@@ -28,9 +28,16 @@ export async function proxy(request: Request) {
       if (!isEvoclabsSubdomain) {
         // Non-localhost, non-evoclabs domain → resolve custom domain from API
         try {
-          const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.evoclabs.com/api/storefront/public';
+          const apiBase = process.env.INTERNAL_API_BASE || 'http://localhost:5000/api/storefront/public';
           const resolveUrl = `${apiBase}/resolve?domain=${cleanHostname}`;
-          const resolveRes = await fetch(resolveUrl, { next: { revalidate: 0 } });
+          let resolveRes;
+          try {
+            resolveRes = await fetch(resolveUrl, { next: { revalidate: 0 } });
+          } catch (localErr) {
+            console.warn('[PROXY] Local domain resolve failed, trying public fallback:', localErr);
+            const publicApiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.evoclabs.com/api/storefront/public';
+            resolveRes = await fetch(`${publicApiBase}/resolve?domain=${cleanHostname}`, { next: { revalidate: 0 } });
+          }
           const resolveData = await resolveRes.json();
           if (resolveData.success && resolveData.store) {
             subdomain = resolveData.store.subdomain;
@@ -52,9 +59,16 @@ export async function proxy(request: Request) {
   }
 
   try {
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.evoclabs.com/api/storefront/public';
+    const apiBase = process.env.INTERNAL_API_BASE || 'http://localhost:5000/api/storefront/public';
     const apiUrl = `${apiBase}/${subdomain}/frontend`;
-    const response = await fetch(apiUrl, { next: { revalidate: 0 } });
+    let response;
+    try {
+      response = await fetch(apiUrl, { next: { revalidate: 0 } });
+    } catch (localErr) {
+      console.warn('[PROXY] Local frontend fetch failed, trying public fallback:', localErr);
+      const publicApiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.evoclabs.com/api/storefront/public';
+      response = await fetch(`${publicApiBase}/${subdomain}/frontend`, { next: { revalidate: 0 } });
+    }
     const data = await response.json();
 
     if (!data.success) {
