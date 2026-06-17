@@ -23,18 +23,31 @@ export async function proxy(request: Request) {
         subdomain = parts[0];
       }
     } else {
-      // For any non-localhost domain (except those ending with evoclabs.com subdomain),
-      // show 404 without calling any API
       const isEvoclabsSubdomain = cleanHostname.endsWith('.evoclabs.com');
 
       if (!isEvoclabsSubdomain) {
-        // Non-localhost, non-evoclabs domain → 404
-        return NextResponse.redirect(new URL('/store-error?reason=Invalid+store+domain', request.url));
+        // Non-localhost, non-evoclabs domain → resolve custom domain from API
+        try {
+          const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.evoclabs.com/api/storefront/public';
+          const resolveUrl = `${apiBase}/resolve?domain=${cleanHostname}`;
+          const resolveRes = await fetch(resolveUrl, { next: { revalidate: 0 } });
+          const resolveData = await resolveRes.json();
+          if (resolveData.success && resolveData.store) {
+            subdomain = resolveData.store.subdomain;
+          } else {
+            return NextResponse.redirect(
+              new URL(`/store-error?reason=${encodeURIComponent(resolveData.message || 'Invalid store domain')}`, request.url)
+            );
+          }
+        } catch (err) {
+          console.error('[PROXY] Custom domain resolve failed:', err);
+          return NextResponse.redirect(new URL('/store-error?reason=Resolution+failed', request.url));
+        }
+      } else {
+        // Valid subdomain pattern: *.evoclabs.com → validate via API
+        const parts = cleanHostname.split('.');
+        subdomain = parts[0];
       }
-
-      // Valid subdomain pattern: *.evoclabs.com → validate via API
-      const parts = cleanHostname.split('.');
-      subdomain = parts[0];
     }
   }
 
