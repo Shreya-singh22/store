@@ -40,6 +40,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       id: product.id,
       name: product.name,
       price: product.price,
+      compareAtPrice: product.compareAtPrice,
       images: product.images,
     }, 1);
   };

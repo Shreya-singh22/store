@@ -16,6 +16,12 @@ const addressSchema = z.object({
   isDefault: z.boolean().optional(),
 });
 
+export async function getStorefrontCodFee(): Promise<number> {
+  const subdomain = await getServerSubdomain();
+  const storefront = await fetchStorefront(subdomain);
+  return storefront.settings?.codFee ?? 40;
+}
+
 export async function createAddress(userId: string, data: z.infer<typeof addressSchema>) {
   try {
     const address = await prisma.address.create({

@@ -6,6 +6,7 @@ export interface CartItem {
   id: string;
   name: string;
   price: number;
+  compareAtPrice?: number;
   quantity: number;
   images?: string[];
   variants?: Record<string, string>;

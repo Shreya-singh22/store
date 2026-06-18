@@ -46,6 +46,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
       id: product.id,
       name: product.name,
       price: displayPrice,
+      compareAtPrice: product.compareAtPrice,
       images: product.images,
       variantId: selectedVariant?.id,
     }, quantity, selectedVariant?.options || {});
@@ -58,6 +59,7 @@ export default function ProductClient({ product, relatedProducts }: ProductClien
       id: product.id,
       name: product.name,
       price: displayPrice,
+      compareAtPrice: product.compareAtPrice,
       images: product.images,
       variantId: selectedVariant?.id,
     }, quantity, selectedVariant?.options || {});
