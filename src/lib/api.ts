@@ -124,6 +124,7 @@ export interface StorefrontData {
     contactEmail: string;
     contactPhone: string;
     enabledGateways: Record<string, { enabled: boolean; keyId: string }>;
+    codFee?: number;
   };
   announcements: Announcement[];
   legalPages: LegalPage[];
@@ -181,7 +182,7 @@ const MOCK_STOREFRONT: StorefrontData = {
   success: true,
   store: { id: 's-1', name: 'Demo Store', subdomain: 'demo', customDomain: null, description: 'Welcome to our generic demo store.', logo: null, category: 'General', theme: 'default', createdAt: '' },
   customization: {} as any,
-  settings: { currency: 'INR', timezone: 'Asia/Kolkata', contactEmail: 'contact@example.com', contactPhone: '', enabledGateways: {} },
+  settings: { currency: 'INR', timezone: 'Asia/Kolkata', contactEmail: 'contact@example.com', contactPhone: '', enabledGateways: {}, codFee: 40 },
   announcements: [],
   legalPages: [],
   products: DUMMY_PRODUCTS,

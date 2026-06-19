@@ -11,11 +11,9 @@ import {
   validateSession,
 } from '@/actions/otp-actions';
 import { getUserByPhone, createOrUpdateUser } from '@/actions/user-actions';
-import { createAddress, createOrder, createCodOrder } from '@/actions/order-actions';
+import { createAddress, createOrder, createCodOrder, getStorefrontCodFee } from '@/actions/order-actions';
 import { initiatePayUPayment } from '@/actions/payment-actions';
 import './checkout.css';
-
-const COD_FEE = 40;
 
 type Step = 'identify' | 'verify' | 'details' | 'payment' | 'success';
 
@@ -31,6 +29,7 @@ const indianStates = [
 
 export default function CheckoutPage() {
   const { cartItems, clearCart, cartTotal } = useCart();
+  const [codFee, setCodFee] = useState(40);
   const [step, setStep] = useState<Step>('identify');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +69,10 @@ export default function CheckoutPage() {
   const [orderSummary, setOrderSummary] = useState<{ items: typeof cartItems; subtotal: number; paymentMethod: string | null } | null>(null);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  useEffect(() => {
+    getStorefrontCodFee().then(fee => setCodFee(fee));
+  }, []);
 
   // Redirect to PayU Hosted Checkout (to avoid domain whitelisting issues)
   useEffect(() => {
@@ -412,7 +415,7 @@ export default function CheckoutPage() {
       const result = await createCodOrder({
         userId: userId || `temp_${phone}`,
         items: orderItems,
-        totalAmount: calculatedSubtotal + COD_FEE,
+        totalAmount: calculatedSubtotal + codFee,
         firstName: customerFirstName,
         lastName: customerLastName,
         email: customerEmail,
@@ -855,7 +858,7 @@ export default function CheckoutPage() {
                       </div>
                       <div>
                         <p className="checkout__payment-title">Cash on Delivery</p>
-                        <p className="checkout__payment-note">+ Rs. {COD_FEE} fee</p>
+                        <p className="checkout__payment-note">+ Rs. {codFee} fee</p>
                       </div>
                     </div>
                   </div>
@@ -879,7 +882,7 @@ export default function CheckoutPage() {
                   <div className="checkout__payment-confirm">
                     <div className="checkout__cod-info">
                       <p>Pay with cash when your order arrives.</p>
-                      <p className="checkout__cod-fee">A fee of Rs. {COD_FEE} applies.</p>
+                      <p className="checkout__cod-fee">A fee of Rs. {codFee} applies.</p>
                     </div>
                     {error && <span className="checkout__error">{error}</span>}
                     {error && (error.includes('Unable to verify') || error.includes('stock')) ? (
@@ -895,7 +898,7 @@ export default function CheckoutPage() {
                       <div className="checkout__payment-actions">
                         <button className="checkout__btn-secondary" onClick={() => setPaymentMethod(null)}>Choose Different Payment</button>
                         <button className="checkout__place-order-btn" onClick={handleCreateCodOrder} disabled={isLoading}>
-                          {isLoading ? <Loader2 className="animate-spin" size={18} /> : `CONFIRM ORDER - ₹${(subtotal + COD_FEE).toLocaleString()}`}
+                          {isLoading ? <Loader2 className="animate-spin" size={18} /> : `CONFIRM ORDER - ₹${(subtotal + codFee).toLocaleString()}`}
                         </button>
                       </div>
                     )}
@@ -954,14 +957,14 @@ export default function CheckoutPage() {
 
           <div className="checkout__summary-rows">
             <div className="checkout__summary-row"><span>Subtotal</span><span>₹{(orderSummary?.subtotal ?? subtotal).toLocaleString('en-IN')}</span></div>
-            {(orderSummary?.paymentMethod === 'COD' || paymentMethod === 'COD') && <div className="checkout__summary-row"><span>COD Fee</span><span>₹{COD_FEE}</span></div>}
+            {(orderSummary?.paymentMethod === 'COD' || paymentMethod === 'COD') && <div className="checkout__summary-row"><span>COD Fee</span><span>₹{codFee}</span></div>}
             <div className="checkout__summary-row checkout__summary-row--green"><span>Shipping</span><span>FREE</span></div>
           </div>
 
           <div className="checkout__summary-divider" />
           <div className="checkout__summary-row checkout__summary-row--total">
             <span>Total</span>
-            <span className="checkout__summary-total-price">₹{((orderSummary?.subtotal ?? subtotal) + ((orderSummary?.paymentMethod === 'COD' || paymentMethod === 'COD') ? COD_FEE : 0)).toLocaleString('en-IN')}</span>
+            <span className="checkout__summary-total-price">₹{((orderSummary?.subtotal ?? subtotal) + ((orderSummary?.paymentMethod === 'COD' || paymentMethod === 'COD') ? codFee : 0)).toLocaleString('en-IN')}</span>
           </div>
 
           <div className="checkout__summary-badges">

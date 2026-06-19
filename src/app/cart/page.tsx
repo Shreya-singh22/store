@@ -13,7 +13,12 @@ export default function CartPage() {
   console.log('[PAGE:Cart] Cart total:', cartTotal);
   console.log('[PAGE:Cart] Cart count:', cartCount);
 
-  const discountAmount = 650;
+  const discountAmount = cartItems.reduce((sum, item) => {
+    if (item.compareAtPrice && item.compareAtPrice > item.price) {
+      return sum + (item.compareAtPrice - item.price) * item.quantity;
+    }
+    return sum;
+  }, 0);
   const shippingAmount = cartTotal > 499 ? 0 : 49;
   const finalTotal = cartTotal - discountAmount + shippingAmount;
 
@@ -112,10 +117,12 @@ export default function CartPage() {
             <span>{formatPrice(cartTotal)}</span>
           </div>
 
-          <div className="cart__summary-row cart__summary-row--discount">
-            <span>Discount (Extra ₹650 off)</span>
-            <span>- {formatPrice(discountAmount)}</span>
-          </div>
+          {discountAmount > 0 && (
+            <div className="cart__summary-row cart__summary-row--discount">
+              <span>Discount (Extra {formatPrice(discountAmount)} off)</span>
+              <span>- {formatPrice(discountAmount)}</span>
+            </div>
+          )}
 
           <div className="cart__summary-row cart__summary-row--shipping">
             <span>Shipping</span>
